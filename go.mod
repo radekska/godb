@@ -1,4 +1,4 @@
-module godb
+module github.com/radekska/godb
 
 go 1.21.3
 
