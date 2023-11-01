@@ -1,4 +1,36 @@
+/*
+
+The package works on 2 tables on a PostgreSQL data base server.
+
+The names of the tables are:
+
+	* Users
+	* Userdata
+
+The definitions of the tables in the PostgreSQL server are:
+
+	CREATE TABLE Users (
+    	ID SERIAL,
+    	Username VARCHAR(100) PRIMARY KEY
+	);
+
+	CREATE TABLE Userdata (
+    	UserID Int NOT NULL,
+    	Name VARCHAR(100),
+    	Surname VARCHAR(100),
+    	Description VARCHAR(200)
+	);
+
+	This is rendered as code
+
+This is not rendered as code
+
+*/
+
 package godb
+
+// BUG(1): Function ListUsers() not working as expected
+// BUG(2): Function AddUser() is too slow”
 
 import (
 	"database/sql"
@@ -8,6 +40,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
+/*
+This block of global variables holds the connection details to the Postgres server
+
+		Hostname: is the IP or the hostname of the server
+	 	Port: is the TCP port the DB server listens to
+		Username: is the username of the database user
+		Password: is the password of the database user
+		Database: is the name of the Database in PostgreSQL
+*/
 var (
 	Host     = "localhost"
 	Port     = 5432
@@ -21,6 +62,9 @@ const (
 	usersDataTable = "userdata"
 )
 
+// The Userdata structure is for holding full user data
+// from the Userdata table and the Username from the
+// Users table
 type User struct {
 	ID          string
 	Username    string
@@ -29,6 +73,8 @@ type User struct {
 	Description string
 }
 
+// OpenConnection() is for opening the Postgres connection
+// in order to be used by the other functions of the package.
 func OpenConnection() (*sql.DB, error) {
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		Host, Port, Username, Password, Database)
@@ -99,6 +145,8 @@ func AddUser(db *sql.DB, user User) (string, error) {
 	return userID, nil
 }
 
+// ListUsers lists all users in the database
+// and returns a slice of Userdata.
 func ListUsers(db *sql.DB) ([]User, error) {
 	rows, err := db.Query(
 		fmt.Sprintf(
